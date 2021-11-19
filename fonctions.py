@@ -1,7 +1,10 @@
-#TODO : créer une fonction main, GetID, GetToken, GetRequest et gerer les demandes à faire 
+#################################################################################################
 
 import requests
 import json
+import pandas as pd
+
+#################################################################################################
 
 # Defines the function to intercept a token
 def GetToken(Client_ID):
@@ -10,16 +13,13 @@ def GetToken(Client_ID):
     AutParams = {'client_id': Client_ID,
                 'client_secret': Secret,
                 'grant_type': 'client_credentials',
-                'scope': "channel_subscriptions channel_read user_read"
+                'scope': "channel:read:subscriptions"
                 }
     AutCall = requests.post(url=authURL, params=AutParams) 
     access_token = AutCall.json()['access_token']
     return access_token
 
-# Defines the function to send a request
-def GetRequest(URL,head):
-    r = requests.get(URL, headers = head).json()['data']
-    return r
+#################################################################################################
 
 # Defines the function to collect the streamer id
 def GetID(Client_ID, access_token, streamer_name):
@@ -28,7 +28,9 @@ def GetID(Client_ID, access_token, streamer_name):
     'Client-ID' : Client_ID,
     'Authorization' :  "Bearer " + access_token
     }
-    return GetRequest(URL,head)[0]["id"]
+    return requests.get(URL, headers = head).json()['data'][0]["id"]
+
+#################################################################################################
 
 # Defines the function to collect the list of top games
 def GetTopGames(Client_ID, access_token):
@@ -37,8 +39,7 @@ def GetTopGames(Client_ID, access_token):
     'Client-ID' : Client_ID,
     'Authorization' :  "Bearer " + access_token
     }
-    x = GetRequest(URL,head)
-    #print(json.dumps(x, indent=4, sort_keys=True))
+    x = requests.get(URL, headers = head).json()['data']
     return x
 
 def GetChannelIcalendar(Client_ID, access_token, broadcaster_id):
@@ -50,28 +51,24 @@ def GetChannelIcalendar(Client_ID, access_token, broadcaster_id):
     x = requests.get(URL, headers = head)
     return x #return un fichier .pyc ??
 
-# def GetFollowedStreams(Client_ID, access_token, user_id):
-#     URL = "https://api.twitch.tv/helix/streams/followed?user_id="+user_id
-#     head = {
-#     'Client-ID' : Client_ID,
-#     'Authorization' :  "Bearer " + access_token
-#     }
-#     x = requests.get(URL, headers = head)
-#     #print(json.dumps(x, indent=4, sort_keys=True))
-#     #print(x)
-#     #return x
-# PROBLEME : POUR LES STREAMERS
+def GetBroadcasterSubscriptions(Client_ID, access_token, broadcaster_id):
+    URL = "https://api.twitch.tv/helix/subscriptions?broadcaster_id="+broadcaster_id
+    head = {
+    'Client-ID' : Client_ID,
+    'Authorization' :  "Bearer " + access_token
+    }
+    x = requests.get(URL, headers = head)
+    return x
 
-# def GetBroadcasterSubscriptions(Client_ID, access_token, broadcaster_id):
-#     URL = "https://api.twitch.tv/helix/subscriptions?broadcaster_id="+broadcaster_id
-#     head = {
-#     'Client-ID' : Client_ID,
-#     'Authorization' :  "Bearer " + access_token
-#     }
-#     x = requests.get(URL, headers = head).json()
-#     print(json.dumps(x, indent=4, sort_keys=True))
-#     #return x
-# PROBLEME : POUR LES STREAMERS
+def GetChannelStreamSchedule(Client_ID, access_token, broadcaster_id):
+    URL = "https://api.twitch.tv/helix/schedule?broadcaster_id="+broadcaster_id
+    head = {
+    'Client-ID' : Client_ID,
+    'Authorization' :  "Bearer " + access_token
+    }
+    x = requests.get(URL, headers = head).json()
+    return x
+    #Ne trouve pas d'edt dans les 5 cas
 
 def GetVideos(Client_ID, access_token, broadcaster_id):
     URL = "https://api.twitch.tv/helix/videos?broadcaster_id="+broadcaster_id
@@ -80,7 +77,35 @@ def GetVideos(Client_ID, access_token, broadcaster_id):
     'Authorization' :  "Bearer " + access_token
     }
     x = requests.get(URL, headers = head).json()
-    print(x)
-    #return x
+    return x
 
+def GetXX(Client_ID, access_token, broadcaster_id):
+    URL = "https://api.twitch.tv/helix/streams?broadcaster_id="+broadcaster_id
+    head = {
+    'Client-ID' : Client_ID,
+    'Authorization' :  "Bearer " + access_token
+    }
+    x = requests.get(URL, headers = head).json()
+    return x
 
+def GetXXX(Client_ID, access_token, broadcaster_id):
+    URL = "https://api.twitch.tv/helix/users?login="+broadcaster_id
+    head = {
+    'Client-ID' : Client_ID,
+    'Authorization' :  "Bearer " + access_token
+    }
+    x = requests.get(URL, headers = head).json()['data'][0]
+    return x
+
+#################################################################################################
+
+def CreateDataSet(Client_ID, access_token, streamer_names, X):     
+    datas = []
+    for i in range (len(streamer_names)):
+        JSONContent = X(Client_ID, access_token, streamer_names[i])
+        datas.append([JSONContent['id'], JSONContent['display_name'], JSONContent['view_count']])
+    dataset = pd.DataFrame(datas)
+    dataset.columns = ['Id', 'Name', 'Views']
+    dataset.dropna(axis = 0, how = 'any', inplace = True)
+    dataset.index = pd.RangeIndex(len(dataset.index))
+    print(dataset)
