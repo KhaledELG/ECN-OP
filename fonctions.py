@@ -108,4 +108,4 @@ def CreateDataSet(Client_ID, access_token, streamer_names, X):
     dataset.columns = ['Id', 'Name', 'Views']
     dataset.dropna(axis = 0, how = 'any', inplace = True)
     dataset.index = pd.RangeIndex(len(dataset.index))
-    print(dataset)
+    return dataset
