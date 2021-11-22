@@ -3,13 +3,14 @@
 import requests
 import json
 import pandas as pd
+import config
 
 #################################################################################################
 
 # Defines the function to intercept a token
 def GetToken(Client_ID):
     authURL = 'https://id.twitch.tv/oauth2/token'
-    Secret  = "byddoub52je363dea4ntqnueqs4qlu"
+    Secret  = config.Secret
     AutParams = {'client_id': Client_ID,
                 'client_secret': Secret,
                 'grant_type': 'client_credentials',

@@ -1,6 +1,7 @@
 import fonctions
+import config
 
-Client_ID = "uffof989s0jlx0rsqltxfd9twmhwbs"
+Client_ID = config.Client_ID
 streamer_name = ["ironmouse","nekomatokayu","usadapekora_hololive","akaihaato_hololive", "slipixxx"]
 access_token = fonctions.GetToken(Client_ID)
 
