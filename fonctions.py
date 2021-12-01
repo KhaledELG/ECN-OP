@@ -4,6 +4,7 @@ import requests
 import json
 import pandas as pd
 import config
+import datetime
 
 #################################################################################################
 
@@ -54,6 +55,38 @@ def GetNextVideos(Client_ID, access_token, broadcaster_id, after):
     }
     x = requests.get(URL, headers = head).json()
     return x
+
+def MostStreamedDay(test, streamer_name):
+    tbl,i,lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche=[],0,0,0,0,0,0,0,0
+    for j in range (len(streamer_name)) :
+        ok=test['Created at'][i][:10].split('-') #extrait la date ligne i
+        now = datetime.datetime(int(ok[0]), int(ok[1]), int(ok[2])).weekday() #donne le jour
+        while test['Streamer Name'][i]==streamer_name[j]:
+            if i+1<len(test): 
+                i=i+1   
+                if now == 0 : lundi=lundi+1
+                elif now == 1 : mardi=mardi+1
+                elif now == 2 : mercredi=mercredi+1
+                elif now == 3 : jeudi=jeudi+1
+                elif now == 4 : vendredi=vendredi+1
+                elif now == 5 : samedi=samedi+1
+                else : dimanche=dimanche+1
+                ok=test['Created at'][i][:10].split('-') #extrait la date ligne i
+                now = datetime.datetime(int(ok[0]), int(ok[1]), int(ok[2])).weekday() #donne le jour
+            else : 
+                ok=test['Created at'][i][:10].split('-') #extrait la date ligne i
+                now = datetime.datetime(int(ok[0]), int(ok[1]), int(ok[2])).weekday() #donne le jour
+                if now == 0 : lundi=lundi+1
+                elif now == 1 : mardi=mardi+1
+                elif now == 2 : mercredi=mercredi+1
+                elif now == 3 : jeudi=jeudi+1
+                elif now == 4 : vendredi=vendredi+1
+                elif now == 5 : samedi=samedi+1
+                else : dimanche=dimanche+1
+                break
+        tbl.append([lundi, mardi, mercredi, jeudi, vendredi, samedi , dimanche, test['Streamer Name'][i-1]])
+        lundi,mardi,mercredi,jeudi,vendredi,samedi,dimanche=0,0,0,0,0,0,0
+    return tbl
 
 #################################################################################################
 

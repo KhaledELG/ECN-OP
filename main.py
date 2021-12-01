@@ -3,12 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import json
 import config
+import datetime
 
 # Information of the identifier and the token
 Client_ID = config.Client_ID
 access_token = fonctions.GetToken(Client_ID)
 # Streamers names information
-streamer_name = ["joueur_du_grenier","slipixxx"]
+streamer_name = ["Joueur_du_Grenier","Slipixxx"]
 # Initialization of variables
 datas = []
 # Initialization of the tool for writing 
@@ -22,7 +23,7 @@ for i in range (len(streamer_name)):
     dataset.columns = ['Created at', 'Duration', 'Streamer Name', 'Title', 'Views']
     dataset.dropna(axis = 0, how = 'any', inplace = True)
     dataset.index = pd.RangeIndex(len(dataset.index))
-#     # Creation of the Excel file
+    # Creation of the Excel file
 #     dataset.to_excel(writer, sheet_name=streamer_name[i], index=False)
 #     datas=[]
 # writer.save()
@@ -31,12 +32,11 @@ for i in range (len(streamer_name)):
 # Calculation of views per streamer
 ViewsPerStreamer = dataset.groupby(['Streamer Name'])['Views'].sum()
 # Average video length per streamer
-data_tmp=dataset
-data_tmp['Duration'] = pd.to_datetime(data_tmp['Duration'])
-AverageVideoLengthPerStreamer = ((data_tmp.groupby(['Streamer Name'])['Duration']).mean()).dt.time
-
-# print(AverageVideoLengthPerStreamer)
-
+dataset['Duration'] = pd.to_datetime(dataset['Duration'])
+AverageVideoLengthPerStreamer = ((dataset.groupby(['Streamer Name'])['Duration']).mean()).dt.time
+# Most streamed day
+MostStreamedDay = fonctions.MostStreamedDay(dataset[['Created at','Streamer Name']], streamer_name)
+print (MostStreamedDay)
 # Création_histogramme_data
 # hist=plt.bar(dataset['Streamer Name'],dataset['Views'])
 # plt.show()
