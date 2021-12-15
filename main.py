@@ -9,7 +9,7 @@ import datetime
 Client_ID = config.Client_ID
 access_token = fonctions.GetToken(Client_ID)
 # Streamers names information
-streamer_name = ["Joueur_du_Grenier","Slipixxx"]
+streamer_name = ["ironmouse", "nyanners", "Silvervale", "Zentreya", "projektmelody", "Hajime", "veibae"]
 # Initialization of variables
 datas = []
 # Initialization of the tool for writing 
@@ -27,13 +27,15 @@ for i in range (len(streamer_name)):
 #     dataset.to_excel(writer, sheet_name=streamer_name[i], index=False)
 #     datas=[]
 # writer.save()
- 
+print(dataset)
 # Start of data processing
 # Calculation of views per streamer
 ViewsPerStreamer = dataset.groupby(['Streamer Name'])['Views'].sum()
+print (ViewsPerStreamer)
 # Average video length per streamer
 dataset['Duration'] = pd.to_datetime(dataset['Duration'])
 AverageVideoLengthPerStreamer = ((dataset.groupby(['Streamer Name'])['Duration']).mean()).dt.time
+print (AverageVideoLengthPerStreamer)
 # Most streamed day
 MostStreamedDay = fonctions.MostStreamedDay(dataset[['Created at','Streamer Name']], streamer_name)
 print (MostStreamedDay)

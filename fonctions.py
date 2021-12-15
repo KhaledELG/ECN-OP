@@ -18,6 +18,7 @@ def GetToken(Client_ID):
                 'scope': "channel:read:subscriptions"
                 }
     AutCall = requests.post(url=authURL, params=AutParams) 
+    print(AutCall.text)
     access_token = AutCall.json()['access_token']
     return access_token
 
